@@ -6,7 +6,16 @@ using Sirenix.OdinInspector;
 
 public class WFCTileGenerator : MonoBehaviour
 {
-    public GameObject tileSet;
+    public GameObject tilePrefabContainer;
+
+    Dictionary<string, Vector3Int> directions = new Dictionary<string, Vector3Int>(){
+                {"forward", Vector3Int.forward},
+                {"back", Vector3Int.back},
+                {"left", Vector3Int.left},
+                {"right", Vector3Int.right},
+                {"up", Vector3Int.up},
+                {"down", Vector3Int.down},
+            };
 
     int GenerateTileHash(Transform tile)
     {
@@ -19,11 +28,24 @@ public class WFCTileGenerator : MonoBehaviour
             tileHash += v.ToString();
         }
         return tileHash.GetHashCode();
+
+        // int output = 0;
+        // foreach(Vector3 vertex in tileVerts){
+        //     output = output ^ vertex.GetHashCode();
+        // }
+        // return output;
     }
 
     [Button("Generate Tile Assets")]
     void GenerateTileMetadataAsset()
     {
+        // remove generatedTilePrefabs gameobject if it exists
+        if (GameObject.Find("generatedTilePrefabs") != null)
+        {
+            DestroyImmediate(GameObject.Find("generatedTilePrefabs"));
+        }
+        GameObject generatedTilePrefabs = new GameObject("generatedTilePrefabs");
+
         WFCTileset tileset = WFCTileset.CreateInstance<WFCTileset>();
 
         // detete the existing Tiles folder
@@ -37,11 +59,17 @@ public class WFCTileGenerator : MonoBehaviour
         // store each unique tile as a hash of it's vertices and the corrosponding gameobject
         Dictionary<int, GameObject> uniqueTiles = new Dictionary<int, GameObject>();
         List<int> tileHashes = new List<int>();
-        // loop trough all tiles, hash them, then add them to a dictionary if they are unique
-        // add boxcollider for raycasting
-        for (var i = 0; i < tileSet.transform.childCount; i++)
+
+        // loop through each tile in the container and:
+        // 1. instantiate a gameobject for the tile to the scene
+        // 2. add a boxcollider if it doesn't already have one
+        // 3. generate a hash of the tile's vertices
+        // 4. add the tile to the uniquetiles list if it's hash is unique
+        for (var i = 0; i < tilePrefabContainer.transform.childCount; i++)
         {
-            Transform tile = tileSet.transform.GetChild(i);
+            Transform tile = Instantiate(tilePrefabContainer.transform.GetChild(i));
+            tile.parent = generatedTilePrefabs.transform;
+
             if (tile.gameObject.GetComponent<BoxCollider>() == null)
             {
                 BoxCollider bc = tile.gameObject.AddComponent<BoxCollider>();
@@ -50,7 +78,6 @@ public class WFCTileGenerator : MonoBehaviour
             }
 
             int tileHash = GenerateTileHash(tile);
-            //if (tileHash == 0) continue;
             if (!tileHashes.Contains(tileHash))
             {
                 tileHashes.Add(tileHash);
@@ -64,14 +91,15 @@ public class WFCTileGenerator : MonoBehaviour
             WFCTile wfcTile = WFCTile.CreateInstance<WFCTile>();
             wfcTile.tileId = tile.name;
             wfcTile.tileGameObject = tile.gameObject;
-            if(tile.GetComponent<MeshFilter>() == null){
+            if (tile.GetComponent<MeshFilter>() == null)
+            {
                 wfcTile.isEmpty = true;
             }
             AssetDatabase.CreateAsset(wfcTile, "Assets/Tiles/" + wfcTile.tileId + ".asset");
         }
 
         // go through every mesh in the tileSet and create and 
-        Transform[] tiles = tileSet.GetComponentsInChildren<Transform>();
+        Transform[] tiles = generatedTilePrefabs.GetComponentsInChildren<Transform>();
         foreach (Transform tile in tiles)
         {
             // grab the collider and skip if it's null
@@ -91,58 +119,46 @@ public class WFCTileGenerator : MonoBehaviour
             // get the unique tile from assets
             WFCTile wfcTile = AssetDatabase.LoadAssetAtPath<WFCTile>("Assets/Tiles/" + uniqueTile.name + ".asset");
 
-            // get first transform in positive x direction
-            RaycastHit hit;
-            // forward
-            if (Physics.Raycast(tile.transform.position, transform.TransformDirection(Vector3.forward), out hit, Mathf.Infinity))
+            foreach (string directionString in directions.Keys)
             {
-                GameObject hashedNeighbourTile = uniqueTiles[GenerateTileHash(hit.transform)];
-                WFCTile neighbourTile = AssetDatabase.LoadAssetAtPath<WFCTile>("Assets/Tiles/" + hashedNeighbourTile.name + ".asset");
-                if (!wfcTile.forwardNeighbors.Contains(neighbourTile))
+                directions.TryGetValue(directionString, out Vector3Int dir);
+                RaycastHit hit;
+
+                if (Physics.Raycast(tile.transform.position, dir, out hit, 2f))
                 {
-                    wfcTile.forwardNeighbors.Add(neighbourTile);
+                    GameObject hashedNeighbourTile = uniqueTiles[GenerateTileHash(hit.transform)];
+                    WFCTile neighbourTile = AssetDatabase.LoadAssetAtPath<WFCTile>("Assets/Tiles/" + hashedNeighbourTile.name + ".asset");
+                    List<WFCTile> neighbours = (List<WFCTile>)typeof(WFCTile).GetField(directionString + "Neighbors").GetValue(wfcTile);
+                    if (!neighbours.Contains(neighbourTile))
+                    {
+                        neighbours.Add(neighbourTile);
+                    }
                 }
-            }
-            // back
-            if (Physics.Raycast(tile.transform.position, transform.TransformDirection(Vector3.back), out hit, Mathf.Infinity))
-            {
-                GameObject hashedNeighbourTile = uniqueTiles[GenerateTileHash(hit.transform)];
-                WFCTile neighbourTile = AssetDatabase.LoadAssetAtPath<WFCTile>("Assets/Tiles/" + hashedNeighbourTile.name + ".asset");
-                if (!wfcTile.backNeighbors.Contains(neighbourTile))
+                else
                 {
-                    wfcTile.backNeighbors.Add(neighbourTile);
-                }
-            }
-            // left
-            if (Physics.Raycast(tile.transform.position, transform.TransformDirection(Vector3.left), out hit, Mathf.Infinity))
-            {
-                GameObject hashedNeighbourTile = uniqueTiles[GenerateTileHash(hit.transform)];
-                WFCTile neighbourTile = AssetDatabase.LoadAssetAtPath<WFCTile>("Assets/Tiles/" + hashedNeighbourTile.name + ".asset");
-                if (!wfcTile.leftNeighbors.Contains(neighbourTile))
-                {
-                    wfcTile.leftNeighbors.Add(neighbourTile);
-                }
-            }
-            // right
-            if (Physics.Raycast(tile.transform.position, transform.TransformDirection(Vector3.right), out hit, Mathf.Infinity))
-            {
-                GameObject hashedNeighbourTile = uniqueTiles[GenerateTileHash(hit.transform)];
-                WFCTile neighbourTile = AssetDatabase.LoadAssetAtPath<WFCTile>("Assets/Tiles/" + hashedNeighbourTile.name + ".asset");
-                if (!wfcTile.rightNeighbors.Contains(neighbourTile))
-                {
-                    wfcTile.rightNeighbors.Add(neighbourTile);
+                    GameObject hashedNeighbourTile = uniqueTiles[-1];
+                    WFCTile neighbourTile = AssetDatabase.LoadAssetAtPath<WFCTile>("Assets/Tiles/" + hashedNeighbourTile.name + ".asset");
+                    List<WFCTile> neighbours = (List<WFCTile>)typeof(WFCTile).GetField(directionString + "Neighbors").GetValue(wfcTile);
+                    if (neighbours.Count == 0)
+                    {
+                        neighbours.Add(neighbourTile);
+                    }
                 }
             }
 
-            // update the tile's neighbour list and add to tilest
-            // wfcTile.SetNNeighbours();
+            // set the number of neighbours
+            wfcTile.SetNNeighbours();
+
+            // add the tile to the tilset asset
             if (!tileset.tiles.Contains(wfcTile))
             {
                 tileset.tiles.Add(wfcTile);
             }
+
         }
 
         AssetDatabase.CreateAsset(tileset, "Assets/Tiles/" + "WFCTileset" + ".asset");
+        generatedTilePrefabs.SetActive(false);
     }
 
     void OnDrawGizmos()
@@ -150,50 +166,3 @@ public class WFCTileGenerator : MonoBehaviour
 
     }
 }
-
-
-// List<GameObject> uniqueTiles = new List<GameObject>();
-
-// foreach (Transform tile in tileSet.GetComponentsInChildren<Transform>())
-// {
-//     MeshFilter tileMeshFilter = tile.GetComponent<MeshFilter>();
-//     if (tileMeshFilter == null) continue;
-//     List<Vector3> tileVerts = new List<Vector3>(tile.GetComponent<MeshFilter>().sharedMesh.vertices);
-
-//     if (uniqueTiles.Count == 0)
-//     {
-//         uniqueTiles.Add(tile.gameObject);
-//     }
-
-//     bool allUnique = true;
-//     foreach (GameObject uniqueTile in uniqueTiles)
-//     {
-//         MeshFilter uniqueTileMeshFilter = uniqueTile.GetComponent<MeshFilter>();
-//         List<Vector3> uniqueTileVerts = new List<Vector3>(uniqueTileMeshFilter.sharedMesh.vertices);
-
-//         bool[] equalVerts = new bool[uniqueTileVerts.Count];
-
-//         if (uniqueTileVerts.Count == tileVerts.Count)
-//         {
-//             for (var i = 0; i < uniqueTileVerts.Count; i++)
-//             {
-//                 if (uniqueTileVerts[i].Equals(tileVerts[i]))
-//                 {
-//                     equalVerts[i] = true;
-//                 }
-//                 else
-//                 {
-//                     equalVerts[i] = false;
-//                 }
-//             }
-//         }
-//         List<bool> equalVertsList = new List<bool>(equalVerts);
-
-//         if (!equalVertsList.Contains(false))
-//         {
-//             allUnique = false;
-//             break;
-//         }
-//     }
-//     if (allUnique) uniqueTiles.Add(tile.gameObject);
-// }

@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class WFCTile : ScriptableObject
 {
+    [Range(0f, 1f)]
+    public float weight = 1f;
     public GameObject tileGameObject;
     public string tileId;
     public bool isEmpty;
+
     public int nNeightbours = 0;
 
     public List<WFCTile> forwardNeighbors = new List<WFCTile>();

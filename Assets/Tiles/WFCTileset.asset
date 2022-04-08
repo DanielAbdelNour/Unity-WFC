@@ -13,17 +13,20 @@ MonoBehaviour:
   m_Name: WFCTileset
   m_EditorClassIdentifier: 
   tiles:
-  - {fileID: 11400000, guid: 2ad3c03a0f4614b0a92c86bf47f80bd9, type: 2}
-  - {fileID: 11400000, guid: 3e5b90686638e4015b353652d4d8a877, type: 2}
-  - {fileID: 11400000, guid: 795a5a9d85ea14d6ba9a629728546676, type: 2}
-  - {fileID: 11400000, guid: 2a0114623000243dca46925ee9652117, type: 2}
-  - {fileID: 11400000, guid: 1c36b4d78df55427e897cbbff31f1836, type: 2}
-  - {fileID: 11400000, guid: b4ac55f98c9bd4965ad0a6d393869072, type: 2}
-  - {fileID: 11400000, guid: 41526a69825b740cead6d104df5b89dc, type: 2}
-  - {fileID: 11400000, guid: 658e788a7045a4ac0b1fc96f093db072, type: 2}
-  - {fileID: 11400000, guid: 54ef2acd19cf144ec893e33a6f26148d, type: 2}
-  - {fileID: 11400000, guid: addc796d00e9d483d8f58f89e77338ca, type: 2}
-  - {fileID: 11400000, guid: e279146a6af9147a9b6a0cf0b160155a, type: 2}
-  - {fileID: 11400000, guid: 14f38c336dd174d20ab2b1cd60a363d6, type: 2}
-  - {fileID: 11400000, guid: 4b8ea56fb51144aaabfb97335d0b9e78, type: 2}
-  - {fileID: 11400000, guid: a8124d2edc2b1412ea6d01c3fdb85753, type: 2}
+  - {fileID: 11400000, guid: 265da608f0b174586811cca82c54f26b, type: 2}
+  - {fileID: 11400000, guid: 501279ee5e51e4360891d27df9a40204, type: 2}
+  - {fileID: 11400000, guid: 902194dbf605b40d0af4d9c0bbbbe820, type: 2}
+  - {fileID: 11400000, guid: ba508c3eb9ead4fb087c750b01574edc, type: 2}
+  - {fileID: 11400000, guid: 7f799c1ab7b944220a8140a43909545f, type: 2}
+  - {fileID: 11400000, guid: d3ef40e7c85064c7c8673224ac6f46c0, type: 2}
+  - {fileID: 11400000, guid: 4c77ad13dadab443888e057670d78a6a, type: 2}
+  - {fileID: 11400000, guid: a522d46801c5544d19e4659123c6be78, type: 2}
+  - {fileID: 11400000, guid: fa86358ace56248ec8f93282c97deda9, type: 2}
+  - {fileID: 11400000, guid: 44f6be8842799422a9c0d0c96627db92, type: 2}
+  - {fileID: 11400000, guid: 3e0a5dd10dacc4e9ba373dbd9ef06858, type: 2}
+  - {fileID: 11400000, guid: ef6bf0208074945d7a21bc5752f8c504, type: 2}
+  - {fileID: 11400000, guid: ebe609dca2f7649698b4adb53317293b, type: 2}
+  - {fileID: 11400000, guid: e9d443b754d494efcbc12dec1bf0d180, type: 2}
+  - {fileID: 11400000, guid: fc64a5b560418431a905d8c6c7d1992c, type: 2}
+  - {fileID: 11400000, guid: 0e3f3682ca40d4a1bb77ffeae10ac360, type: 2}
+  - {fileID: 11400000, guid: 8d28f5c57aea04c7694c6dbaa9d56ab9, type: 2}

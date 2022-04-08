@@ -24,9 +24,48 @@ public class LevelGenerator : MonoBehaviour
     public int MAX_Y = 0;
     public int MAX_Z = 10;
     public WFCTileset tileset;
+
+    [ShowInInspector]
     private List<WFCCell> cells;
+    [ShowInInspector]
     private Stack<WFCCell> stack;
     List<Vector3Int> dirs = new List<Vector3Int>() { Vector3Int.forward, Vector3Int.back, Vector3Int.left, Vector3Int.right, Vector3Int.up, Vector3Int.down };
+
+    public int GetRandomWeightedIndex(float[] weights)
+    {
+        if (weights == null || weights.Length == 0) return -1;
+
+        float w;
+        float t = 0;
+        int i;
+        for (i = 0; i < weights.Length; i++)
+        {
+            w = weights[i];
+
+            if (float.IsPositiveInfinity(w))
+            {
+                return i;
+            }
+            else if (w >= 0f && !float.IsNaN(w))
+            {
+                t += weights[i];
+            }
+        }
+
+        float r = Random.value;
+        float s = 0f;
+
+        for (i = 0; i < weights.Length; i++)
+        {
+            w = weights[i];
+            if (float.IsNaN(w) || w <= 0f) continue;
+
+            s += w / t;
+            if (s >= r) return i;
+        }
+
+        return -1;
+    }
 
     bool IsCollapsed()
     {
@@ -36,11 +75,48 @@ public class LevelGenerator : MonoBehaviour
     void Collapse(WFCCell cell)
     {
         WFCTile selectedCandidate = cell.candidates[Random.Range(0, cell.candidates.Count)];
+        //int randomIndex = GetRandomWeightedIndex(cell.candidates.ConvertAll(x => x.weight).ToArray());
+        //WFCTile selectedCandidate = cell.candidates[randomIndex];
         cell.selectedCandidate = selectedCandidate;
         cell.candidates = new List<WFCTile>();
         cell.collapsed = true;
+
+        //Add the tile to the scene
+        GameObject go = Instantiate(cell.selectedCandidate.tileGameObject, cell.position, Quaternion.Euler(-90, 0, 0), GameObject.Find("GeneratedLevel").transform);
+        go.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
     }
 
+    [Title("Debug Stepthrough")]
+    [Button("Generate Cells Step")]
+    void GenerateCells()
+    {
+        // find and destroy generatedLevel gameobject
+        if (GameObject.Find("GeneratedLevel") != null)
+        {
+            DestroyImmediate(GameObject.Find("GeneratedLevel"));
+        }
+
+
+        GameObject generatedLevel = new GameObject("GeneratedLevel");
+
+        stack = new Stack<WFCCell>();
+        cells = new List<WFCCell>();
+
+        // create a 3d list of cells and give each cell the complete list of candidates
+        for (int x = 0; x < MAX_X; x++)
+        {
+            for (int y = 0; y < MAX_Y; y++)
+            {
+                for (int z = 0; z < MAX_Z; z++)
+                {
+                    WFCCell cell = new WFCCell(new Vector3Int(x, y, z), new List<WFCTile>(tileset.tiles));
+                    cells.Add(cell);
+                }
+            }
+        }
+    }
+
+    [Button("Iterate Step")]
     void Iterate()
     {
         // find the cell with the lowest number of candidates that isn't collapsed (has more than one candidate)
@@ -48,6 +124,22 @@ public class LevelGenerator : MonoBehaviour
 
         int minCandidateCount = allUnCollapsed.ConvertAll(c => c.candidates.Count).Min();
         WFCCell lowestCandidatesCell = allUnCollapsed.Find(c => c.candidates.Count == minCandidateCount);
+
+        // List<float> cellEntropies = new List<float>();
+        // foreach (var cell in allUnCollapsed)
+        // {
+        //     List<float> logProbs = new List<float>();
+        //     foreach (var candidate in cell.candidates)
+        //     {
+        //         float logProb = candidate.weight * Mathf.Log(candidate.weight);
+        //         logProbs.Add(logProb);
+        //     }
+        //     float entropy = -logProbs.Sum();
+        //     cellEntropies.Add(entropy);
+        // }
+
+        // int minEntropyIndex = cellEntropies.ToList().IndexOf(cellEntropies.Min());
+        // WFCCell lowestCandidatesCell = allUnCollapsed[minEntropyIndex];
 
         // collapse this cell to a single wfctile
         Collapse(lowestCandidatesCell);
@@ -85,7 +177,7 @@ public class LevelGenerator : MonoBehaviour
                     continue;
                 }
 
-                for (int i = cellAtDir.candidates.Count-1; i >= 0; i--)
+                for (int i = cellAtDir.candidates.Count - 1; i >= 0; i--)
                 {
                     WFCTile candidate = cellAtDir.candidates[i];
                     // remove non valid neighbours from the candidates at direction
@@ -107,26 +199,11 @@ public class LevelGenerator : MonoBehaviour
 
 
 
+    [Title("Level Generator")]
     [Button("Generate Level")]
     void GenerateLevel()
     {
-        stack = new Stack<WFCCell>();
-        cells = new List<WFCCell>();
-
-        //List<WFCTile> tiles = new List<WFCTile>(tileset.tiles);
-
-        // create a 3d list of cells and give each cell the complete list of candidates
-        for (int x = 0; x < MAX_X; x++)
-        {
-            for (int y = 0; y < MAX_Y; y++)
-            {
-                for (int z = 0; z < MAX_Z; z++)
-                {
-                    WFCCell cell = new WFCCell(new Vector3Int(x, y, z), new List<WFCTile>(tileset.tiles));
-                    cells.Add(cell);
-                }
-            }
-        }
+        GenerateCells();
 
         // while there are still candidates iterate the WFC function
         int iter = 0;
@@ -136,15 +213,14 @@ public class LevelGenerator : MonoBehaviour
             iter++;
         }
 
-        foreach (WFCCell cell in cells)
-        {
-            GameObject cellGameObject = cell.selectedCandidate.tileGameObject;
-            if (cellGameObject != null)
-            {
-                GameObject go = Instantiate(cellGameObject, cell.position, Quaternion.Euler(-90, 0, 0), transform);
-                go.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-            }
-        }
-
+        // foreach (WFCCell cell in cells)
+        // {
+        //     GameObject cellGameObject = cell.selectedCandidate.tileGameObject;
+        //     if (cellGameObject != null)
+        //     {
+        //         GameObject go = Instantiate(cellGameObject, cell.position, Quaternion.Euler(-90, 0, 0), generatedLevel.transform);
+        //         go.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        //     }
+        // }
     }
 }
