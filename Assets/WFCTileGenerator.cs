@@ -85,6 +85,37 @@ public class WFCTileGenerator : MonoBehaviour
             }
         }
 
+        // generate empty tile prefabs
+        //GameObject emptyTiles = new GameObject("EmptyTiles");
+        //foreach (Transform tile in generatedTilePrefabs.transform)
+        int initialTileCount = generatedTilePrefabs.transform.childCount;
+        for(int i = 0; i < initialTileCount; i++)
+        {
+            Transform tile = generatedTilePrefabs.transform.GetChild(i);
+            foreach (string directionString in directions.Keys)
+            {
+                directions.TryGetValue(directionString, out Vector3Int dir);
+                RaycastHit hit;
+                if (Physics.Raycast(tile.transform.position, dir, out hit, 2f) == false)
+                {
+                    GameObject emptyTile = new GameObject("Empty");
+                    emptyTile.transform.parent = generatedTilePrefabs.transform;
+                    emptyTile.transform.position = tile.transform.position + dir*2;
+                    emptyTile.AddComponent<BoxCollider>();
+                    emptyTile.GetComponent<BoxCollider>().center = new Vector3(0, 0, 0);
+                    emptyTile.GetComponent<BoxCollider>().size = new Vector3(2, 2, 2);
+
+                    int tileHash = GenerateTileHash(emptyTile.transform);
+                    if (!tileHashes.Contains(tileHash))
+                    {
+                        tileHashes.Add(tileHash);
+                        uniqueTiles.Add(tileHash, emptyTile);
+                    }
+                }
+            }
+        }
+
+
         // create a new asset for every unique tile
         foreach (GameObject tile in uniqueTiles.Values)
         {
@@ -134,16 +165,24 @@ public class WFCTileGenerator : MonoBehaviour
                         neighbours.Add(neighbourTile);
                     }
                 }
-                else
-                {
-                    GameObject hashedNeighbourTile = uniqueTiles[-1];
-                    WFCTile neighbourTile = AssetDatabase.LoadAssetAtPath<WFCTile>("Assets/Tiles/" + hashedNeighbourTile.name + ".asset");
-                    List<WFCTile> neighbours = (List<WFCTile>)typeof(WFCTile).GetField(directionString + "Neighbors").GetValue(wfcTile);
-                    if (neighbours.Count == 0)
-                    {
-                        neighbours.Add(neighbourTile);
-                    }
-                }
+                // else
+                // {
+                //     // there is no neighbour in that direction, so add a empty neighbour
+                //     GameObject hashedEmptyNeighbourTile = uniqueTiles[-1];
+                //     WFCTile emptyNeighbourTile = AssetDatabase.LoadAssetAtPath<WFCTile>("Assets/Tiles/" + hashedEmptyNeighbourTile.name + ".asset");
+                //     List<WFCTile> neighbours = (List<WFCTile>)typeof(WFCTile).GetField(directionString + "Neighbors").GetValue(wfcTile);
+                //     // add the empty neighbour if the list is empty (it should only ever contain empty)
+                //     if (neighbours.Count == 0)
+                //     {
+                //         neighbours.Add(emptyNeighbourTile);
+                //     }
+                //     // add this tile to empty's possible neighbours at direction if it doesn't already exist
+                //     List<WFCTile> emptyNeighbours = (List<WFCTile>)typeof(WFCTile).GetField(directionString + "Neighbors").GetValue(emptyNeighbourTile);
+                //     if (!emptyNeighbours.Contains(wfcTile) && !wfcTile.isEmpty)
+                //     {
+                //         emptyNeighbours.Add(wfcTile);
+                //     }
+                // }
             }
 
             // set the number of neighbours
@@ -158,7 +197,6 @@ public class WFCTileGenerator : MonoBehaviour
         }
 
         AssetDatabase.CreateAsset(tileset, "Assets/Tiles/" + "WFCTileset" + ".asset");
-        generatedTilePrefabs.SetActive(false);
     }
 
     void OnDrawGizmos()

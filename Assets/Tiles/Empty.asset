@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46bdf3dbf9f2c4a758ef6f8328f5e80e, type: 3}
-  m_Name: Cube.130(Clone)
+  m_Name: Empty
   m_EditorClassIdentifier: 
   weight: 1
   tileGameObject: {fileID: 0}
-  tileId: Cube.130(Clone)
-  isEmpty: 0
+  tileId: Empty
+  isEmpty: 1
   nNeightbours: 0
   forwardNeighbors: []
   backNeighbors: []

@@ -78,7 +78,7 @@ public class LevelGenerator : MonoBehaviour
         //int randomIndex = GetRandomWeightedIndex(cell.candidates.ConvertAll(x => x.weight).ToArray());
         //WFCTile selectedCandidate = cell.candidates[randomIndex];
         cell.selectedCandidate = selectedCandidate;
-        cell.candidates = new List<WFCTile>();
+        cell.candidates = new List<WFCTile>() { selectedCandidate };
         cell.collapsed = true;
 
         //Add the tile to the scene
@@ -122,8 +122,19 @@ public class LevelGenerator : MonoBehaviour
         // find the cell with the lowest number of candidates that isn't collapsed (has more than one candidate)
         List<WFCCell> allUnCollapsed = cells.FindAll(c => c.collapsed == false);
 
-        int minCandidateCount = allUnCollapsed.ConvertAll(c => c.candidates.Count).Min();
-        WFCCell lowestCandidatesCell = allUnCollapsed.Find(c => c.candidates.Count == minCandidateCount);
+        List<int> candidateCounts = allUnCollapsed.ConvertAll(c => c.candidates.Count);
+        int minCandidateCount = candidateCounts.Min();
+        WFCCell lowestCandidatesCell = allUnCollapsed.Find(c => c.candidates.Count == minCandidateCount); ;
+
+        // if (candidateCounts.Distinct().Count() == 1)
+        // {
+        //     lowestCandidatesCell = allUnCollapsed[Random.Range(0, allUnCollapsed.Count)];
+        // }
+        // else
+        // {
+        //     lowestCandidatesCell = allUnCollapsed.Find(c => c.candidates.Count == minCandidateCount);
+        // }
+
 
         // List<float> cellEntropies = new List<float>();
         // foreach (var cell in allUnCollapsed)
@@ -155,18 +166,22 @@ public class LevelGenerator : MonoBehaviour
             {
 
                 // get the valid neighbours for this direction for the candidate (item 0 of the candidates list because it's already collapsed)
-                List<WFCTile> validNeighbours;
-                if (currentCell.selectedCandidate != null)
+                // List<WFCTile> validNeighbours;
+                // if (currentCell.selectedCandidate != null)
+                // {
+                //     validNeighbours = currentCell.selectedCandidate.GetValidNeighboursForDirection(dir);
+                // }
+                // else
+                // {
+                //     validNeighbours = new HashSet<WFCTile>(currentCell.candidates.ConvertAll(c =>
+                //     {
+                //         return c.GetValidNeighboursForDirection(dir);
+                //     }).SelectMany(x => x).ToList()).ToList();
+                // }
+                List<WFCTile> validNeighbours = new HashSet<WFCTile>(currentCell.candidates.ConvertAll(c =>
                 {
-                    validNeighbours = currentCell.selectedCandidate.GetValidNeighboursForDirection(dir);
-                }
-                else
-                {
-                    validNeighbours = new HashSet<WFCTile>(currentCell.candidates.ConvertAll(c =>
-                    {
-                        return c.GetValidNeighboursForDirection(dir);
-                    }).SelectMany(x => x).ToList()).ToList();
-                }
+                    return c.GetValidNeighboursForDirection(dir);
+                }).SelectMany(x => x).ToList()).ToList();
 
                 // get the cell at the direction
                 WFCCell cellAtDir = cells.Find(c => c.position == currentCell.position + dir);
@@ -176,6 +191,13 @@ public class LevelGenerator : MonoBehaviour
                 {
                     continue;
                 }
+
+                // int numCandidates = cellAtDir.candidates.Count;
+                // cellAtDir.candidates = new List<WFCTile>(validNeighbours);
+                // if(cellAtDir.candidates.Count != numCandidates && stack.Contains(cellAtDir) == false)
+                // {
+                //     stack.Push(cellAtDir);
+                // }
 
                 for (int i = cellAtDir.candidates.Count - 1; i >= 0; i--)
                 {
