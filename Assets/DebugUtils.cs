@@ -254,12 +254,13 @@ public class DebugUtils : MonoBehaviour
             }
         }
 
-        var backFaceNormalised = backFaceVerts.ConvertAll(x => x - mesh.bounds.center);
-        var frontFaceNormalised = frontFaceVerts.ConvertAll(x => x + mesh.bounds.center);
-        var leftFaceNormalised = leftFaceVerts.ConvertAll(x => x - mesh.bounds.center);
-        var rightFaceNormalised = rightFaceVerts.ConvertAll(x => x + mesh.bounds.center);
-        var bottomFaceNormalised = bottomFaceVerts.ConvertAll(x => x - mesh.bounds.center);
-        var topFaceNormalised = topFaceVerts.ConvertAll(x => x + mesh.bounds.center);
+        var backFaceNormalised = backFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var frontFaceNormalised = frontFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var leftFaceNormalised = leftFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var rightFaceNormalised = rightFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var topFaceNormalised = topFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var bottomFaceNormalised = bottomFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        
 
         faceVertHashes = new Dictionary<string, List<string>>() {
             {"backFace", backFaceNormalised.ConvertAll(x => x.ToString())},
