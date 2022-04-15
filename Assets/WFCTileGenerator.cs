@@ -28,12 +28,6 @@ public class WFCTileGenerator : MonoBehaviour
             tileHash += v.ToString();
         }
         return tileHash.GetHashCode();
-
-        // int output = 0;
-        // foreach(Vector3 vertex in tileVerts){
-        //     output = output ^ vertex.GetHashCode();
-        // }
-        // return output;
     }
 
     [Button("Generate Tile Assets")]
@@ -86,8 +80,6 @@ public class WFCTileGenerator : MonoBehaviour
         }
 
         // generate empty tile prefabs
-        //GameObject emptyTiles = new GameObject("EmptyTiles");
-        //foreach (Transform tile in generatedTilePrefabs.transform)
         int initialTileCount = generatedTilePrefabs.transform.childCount;
         for(int i = 0; i < initialTileCount; i++)
         {
@@ -129,7 +121,7 @@ public class WFCTileGenerator : MonoBehaviour
             AssetDatabase.CreateAsset(wfcTile, "Assets/Tiles/" + wfcTile.tileId + ".asset");
         }
 
-        // go through every mesh in the tileSet and create and 
+        // go through every mesh in the tileSet and create
         Transform[] tiles = generatedTilePrefabs.GetComponentsInChildren<Transform>();
         foreach (Transform tile in tiles)
         {
@@ -165,24 +157,6 @@ public class WFCTileGenerator : MonoBehaviour
                         neighbours.Add(neighbourTile);
                     }
                 }
-                // else
-                // {
-                //     // there is no neighbour in that direction, so add a empty neighbour
-                //     GameObject hashedEmptyNeighbourTile = uniqueTiles[-1];
-                //     WFCTile emptyNeighbourTile = AssetDatabase.LoadAssetAtPath<WFCTile>("Assets/Tiles/" + hashedEmptyNeighbourTile.name + ".asset");
-                //     List<WFCTile> neighbours = (List<WFCTile>)typeof(WFCTile).GetField(directionString + "Neighbors").GetValue(wfcTile);
-                //     // add the empty neighbour if the list is empty (it should only ever contain empty)
-                //     if (neighbours.Count == 0)
-                //     {
-                //         neighbours.Add(emptyNeighbourTile);
-                //     }
-                //     // add this tile to empty's possible neighbours at direction if it doesn't already exist
-                //     List<WFCTile> emptyNeighbours = (List<WFCTile>)typeof(WFCTile).GetField(directionString + "Neighbors").GetValue(emptyNeighbourTile);
-                //     if (!emptyNeighbours.Contains(wfcTile) && !wfcTile.isEmpty)
-                //     {
-                //         emptyNeighbours.Add(wfcTile);
-                //     }
-                // }
             }
 
             // set the number of neighbours

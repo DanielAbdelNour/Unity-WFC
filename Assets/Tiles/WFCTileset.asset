@@ -13,20 +13,9 @@ MonoBehaviour:
   m_Name: WFCTileset
   m_EditorClassIdentifier: 
   tiles:
-  - {fileID: 11400000, guid: 9e80b772e8b714eb99393bf3ad898634, type: 2}
-  - {fileID: 11400000, guid: cc5be06964cd34338b027f0dcbe7521a, type: 2}
-  - {fileID: 11400000, guid: cde0f04a07b1d4246ad662981cca1ec7, type: 2}
-  - {fileID: 11400000, guid: d6c4111c3ac024720873a0af7f18476f, type: 2}
-  - {fileID: 11400000, guid: 283fc1e19f6214d13956c95f38a3eefc, type: 2}
-  - {fileID: 11400000, guid: 2c25fb1fc5d5c420490a27ed447bd4cf, type: 2}
-  - {fileID: 11400000, guid: db56c36aa1cd64e5da12ff7d793d7d05, type: 2}
-  - {fileID: 11400000, guid: af30015d47e4a414c85222222cd15bd2, type: 2}
-  - {fileID: 11400000, guid: 0153e00a0a89d4f9596484392a1c2896, type: 2}
-  - {fileID: 11400000, guid: d6eb25537a1244c0b9b4e657434b5078, type: 2}
-  - {fileID: 11400000, guid: 64d41de3e850f4866a58fc07c046497a, type: 2}
-  - {fileID: 11400000, guid: 21768e20165f9458c891706060d9565b, type: 2}
-  - {fileID: 11400000, guid: 3b85d3a02f6184b9e80b81cbdbd45806, type: 2}
-  - {fileID: 11400000, guid: fb4da4cffc1db4cfabc5c769ba42824a, type: 2}
-  - {fileID: 11400000, guid: 04e87a81ccf254955a21c70b0ec2fdf0, type: 2}
-  - {fileID: 11400000, guid: c3673fe0cabca4b14a9f4b168f857daa, type: 2}
+  - {fileID: 11400000, guid: 0ff374bdfb3e744008599be536b233da, type: 2}
+  - {fileID: 11400000, guid: 22ca80f5b8c454b91909c5d30b79de24, type: 2}
+  - {fileID: 11400000, guid: 229e2a01ea7584d43aa7dc10b5e6cd59, type: 2}
+  - {fileID: 11400000, guid: afef0b50a048247dab2e09cee0159574, type: 2}
+  - {fileID: 11400000, guid: 64025fbb7609b4686821b933cd9fa4a4, type: 2}
   - {fileID: 11400000, guid: 2e1a42d026d874d81ab0ffede155baee, type: 2}
