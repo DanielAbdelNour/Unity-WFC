@@ -2,18 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
-using UnityEditor;
-using System.Linq;
 
-public class DebugUtils : MonoBehaviour
+
+public static class Utils
 {
-    List<Vector3> redGizmoPoints = new List<Vector3>();
-    List<Vector3> greenGizmoPoints = new List<Vector3>();
-    List<Vector3> blueGizmoPoints = new List<Vector3>();
-    List<Vector3> gizmoShapes = new List<Vector3>();
-
     [Button("Mirror X")]
-    void MirrorX(GameObject go)
+    public static void MirrorX(GameObject go)
     {
         MeshFilter tileBMeshFilter = go.GetComponent<MeshFilter>();
         Mesh tileBMesh = tileBMeshFilter.sharedMesh;
@@ -22,7 +16,7 @@ public class DebugUtils : MonoBehaviour
     }
 
     [Button("Mirror Y")]
-    void MirrorZ(GameObject go)
+    public static void MirrorZ(GameObject go)
     {
         MeshFilter tileBMeshFilter = go.GetComponent<MeshFilter>();
         Mesh tileBMesh = tileBMeshFilter.sharedMesh;
@@ -31,7 +25,7 @@ public class DebugUtils : MonoBehaviour
     }
 
     [Button("Flip Triangles")]
-    void FilpTriangles(GameObject go)
+    public static void FilpTriangles(GameObject go)
     {
         MeshFilter tileBMeshFilter = go.GetComponent<MeshFilter>();
         Mesh tileBMesh = tileBMeshFilter.sharedMesh;
@@ -40,16 +34,7 @@ public class DebugUtils : MonoBehaviour
         tileBMesh.SetTriangles(newTriangles, 0);
     }
 
-    [Button("Clear Gizmos")]
-    void ClearGizmos()
-    {
-        redGizmoPoints.Clear();
-        greenGizmoPoints.Clear();
-        blueGizmoPoints.Clear();
-        gizmoShapes.Clear();
-    }
-
-    enum FaceDirection
+    public enum FaceDirection
     {
         leftFace,
         rightFace,
@@ -59,7 +44,7 @@ public class DebugUtils : MonoBehaviour
         backFace
     }
 
-    List<Vector3> GetBoundaryPointsForDirection(GameObject go, FaceDirection direction)
+    public static List<Vector3> GetBoundaryPointsForDirection(GameObject go, FaceDirection direction)
     {
         List<Vector3> vertices = new List<Vector3>(go.GetComponent<MeshFilter>().sharedMesh.vertices);
         List<Vector3> facePoints = new List<Vector3>();
@@ -121,7 +106,7 @@ public class DebugUtils : MonoBehaviour
 
 
     [Button("Get Boundary Points")]
-    Dictionary<FaceDirection, List<Vector3>> GetBoundaryPoints(GameObject go)
+    public static Dictionary<FaceDirection, List<Vector3>> GetBoundaryPoints(GameObject go)
     {
         var mesh = go.GetComponent<MeshFilter>().sharedMesh;
 
@@ -214,43 +199,91 @@ public class DebugUtils : MonoBehaviour
         };
     }
 
-    [Button("Check Vert Match")]
-    void CheckVertMatch(GameObject tileA, GameObject tileB)
+    public static Dictionary<int, GameObject> GetUniqueMeshes(GameObject go)
     {
-        var tileABoundaryPoints = GetBoundaryPoints(tileA);
-        var tileBBoundaryPoints = GetBoundaryPoints(tileB);
+        var meshFilters = go.GetComponentsInChildren<MeshFilter>();
+        var meshDict = new Dictionary<int, GameObject>();
 
+        foreach (var meshFilter in meshFilters)
+        {
+            var mesh = meshFilter.sharedMesh;
+            int meshHash = 0;
+            foreach (var vert in mesh.vertices)
+            {
+                var vertHash = new Vector3(Mathf.Abs(vert.x), Mathf.Abs(vert.y), Mathf.Abs(vert.z)).ToString().GetHashCode();
+                meshHash += vertHash;
+            }
+            if (!meshDict.ContainsKey(meshHash))
+            {
+                meshDict.Add(meshHash, meshFilter.gameObject);
+            }
+        }
+        return meshDict;
     }
 
-    void OnDrawGizmos()
+    [Button("Check Neighbour Match")]
+    public static void CheckNeighbourMatch(GameObject tile, GameObject candidateNeighbour)
     {
-        foreach (var point in redGizmoPoints)
+        var tileBoundaryPoints = GetBoundaryPoints(tile);
+        var candidateNeighbourBoundaryPoints = GetBoundaryPoints(candidateNeighbour);
+
+        // is the candidate a valid neighbour to the left of this tile?
+        // each face looks like {'left': [(x,y,z), (x,y,z), ...], 'right': [(x,y,z), (x,y,z), ...]}
+    }
+
+    public static int GetMeshHash(GameObject go)
+    {
+        var mesh = go.GetComponent<MeshFilter>().sharedMesh;
+        int meshHash = 0;
+        foreach (var rot in new int[] { 0, 90, 180, 270 })
         {
-            // set color to red
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(point, 0.1f);
+            List<Vector3> rotatedVerts = new List<Vector3>(StaticUtils.TransformMesh(mesh, Vector3.zero, Quaternion.Euler(0, rot, 0), new Vector3Int(1, 1, 1)));
+
+            foreach (var vert in rotatedVerts)
+            {
+                var vertHash = new Vector3(Mathf.Abs(vert.x), Mathf.Abs(vert.y), Mathf.Abs(vert.z)).ToString().GetHashCode();
+                meshHash += vertHash;
+            }
         }
-        foreach (var point in greenGizmoPoints)
+        Debug.Log(meshHash);
+        return meshHash;
+    }
+
+    public static int GetMeshHashForRotation(GameObject go, int rot)
+    {
+        var mesh = go.GetComponent<MeshFilter>().sharedMesh;
+        int meshHash = 0;
+
+        List<Vector3> rotatedVerts = new List<Vector3>(StaticUtils.TransformMesh(mesh, Vector3.zero, Quaternion.Euler(0, rot, 0), new Vector3Int(1, 1, 1)));
+
+        foreach (var vert in rotatedVerts)
         {
-            // set color to red
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(point, 0.1f);
-        }
-        foreach (var point in blueGizmoPoints)
-        {
-            // set color to red
-            Gizmos.color = Color.blue;
-            Gizmos.DrawSphere(point, 0.1f);
+            var vertHash = new Vector3(Mathf.Abs(vert.x), Mathf.Abs(vert.y), Mathf.Abs(vert.z)).ToString().GetHashCode();
+            meshHash += vertHash;
         }
 
-        foreach (var point in gizmoShapes)
+        Debug.Log(meshHash);
+        return meshHash;
+    }
+
+
+    public static void GenerateWFCModuleAssets(GameObject go)
+    {
+        var meshHashes = new Dictionary<int, GameObject>();
+
+        for (var i = 0; i < go.transform.childCount; i++)
         {
-            Gizmos.DrawCube(point, new Vector3(2, 2, 2));
+            var child = go.transform.GetChild(i);
+            foreach (var rot in new int[] { 0, 90, 180, 270 })
+            {
+                var meshHash = GetMeshHashForRotation(child.gameObject, 0);
+                // add child if meshHash not in meshHashes
+                if (!meshHashes.ContainsKey(meshHash))
+                {
+                    meshHashes.Add(meshHash, child.gameObject);
+                }
+            }
         }
     }
 
-    void Test()
-    {
-
-    }
 }
