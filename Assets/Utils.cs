@@ -44,9 +44,8 @@ public static class Utils
         backFace
     }
 
-    public static List<Vector3> GetBoundaryPointsForDirection(GameObject go, FaceDirection direction)
+    public static List<Vector3> GetBoundaryPointsForDirection(FaceDirection direction)
     {
-        List<Vector3> vertices = new List<Vector3>(go.GetComponent<MeshFilter>().sharedMesh.vertices);
         List<Vector3> facePoints = new List<Vector3>();
 
         switch (direction)
@@ -104,6 +103,192 @@ public static class Utils
         return facePoints;
     }
 
+    public static Dictionary<FaceDirection, List<Vector3>> GetBoundaryPointsFromVerts(List<Vector3> verts)
+    {
+        List<Vector3> frontFaceVerts = new List<Vector3>();
+
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.frontFace))
+        {
+            foreach (var meshVert in verts)
+            {
+                if (Mathf.Abs(meshVert.x - faceVert.x) < 0.001 && !frontFaceVerts.Contains(meshVert))
+                {
+                    frontFaceVerts.Add(meshVert);
+                }
+            }
+        }
+
+        List<Vector3> backFaceVerts = new List<Vector3>();
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.backFace))
+        {
+            foreach (var meshVert in verts)
+            {
+                if (Mathf.Abs(meshVert.x - faceVert.x) < 0.001 && !backFaceVerts.Contains(meshVert))
+                {
+                    backFaceVerts.Add(meshVert);
+                }
+            }
+        }
+
+        List<Vector3> leftFaceVerts = new List<Vector3>();
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.leftFace))
+        {
+            foreach (var meshVert in verts)
+            {
+                if (Mathf.Abs(meshVert.x - faceVert.x) < 0.001 && !leftFaceVerts.Contains(meshVert))
+                {
+                    leftFaceVerts.Add(meshVert);
+                }
+            }
+        }
+
+        List<Vector3> rightFaceVerts = new List<Vector3>();
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.rightFace))
+        {
+            foreach (var meshVert in verts)
+            {
+                if (Mathf.Abs(meshVert.x - faceVert.x) < 0.001 && !rightFaceVerts.Contains(meshVert))
+                {
+                    rightFaceVerts.Add(meshVert);
+                }
+            }
+        }
+
+        List<Vector3> topFaceVerts = new List<Vector3>();
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.topFace))
+        {
+            foreach (var meshVert in verts)
+            {
+                if (Mathf.Abs(meshVert.y - faceVert.y) < 0.001 && !topFaceVerts.Contains(meshVert))
+                {
+                    topFaceVerts.Add(meshVert);
+                }
+            }
+        }
+
+        List<Vector3> bottomFaceVerts = new List<Vector3>();
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.bottomFace))
+        {
+            foreach (var meshVert in verts)
+            {
+                if (Mathf.Abs(meshVert.y - faceVert.y) < 0.001 && !bottomFaceVerts.Contains(meshVert))
+                {
+                    bottomFaceVerts.Add(meshVert);
+                }
+            }
+        }
+
+        var backFaceNormalised = backFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var frontFaceNormalised = frontFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var leftFaceNormalised = leftFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var rightFaceNormalised = rightFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var topFaceNormalised = topFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var bottomFaceNormalised = bottomFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+
+
+        return new Dictionary<FaceDirection, List<Vector3>>(){
+                {FaceDirection.frontFace, frontFaceNormalised},
+                {FaceDirection.backFace, backFaceNormalised},
+                {FaceDirection.leftFace, leftFaceNormalised},
+                {FaceDirection.rightFace, rightFaceNormalised},
+                {FaceDirection.topFace, topFaceNormalised},
+                {FaceDirection.bottomFace, bottomFaceNormalised},
+        };
+    }
+
+    public static Dictionary<FaceDirection, int> GetHashedBoundaryPointsFromVerts(List<Vector3> verts)
+    {
+        List<Vector3> frontFaceVerts = new List<Vector3>();
+
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.frontFace))
+        {
+            foreach (var meshVert in verts)
+            {
+                if (Mathf.Abs(meshVert.x - faceVert.x) < 0.001 && !frontFaceVerts.Contains(meshVert))
+                {
+                    frontFaceVerts.Add(meshVert);
+                }
+            }
+        }
+
+        List<Vector3> backFaceVerts = new List<Vector3>();
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.backFace))
+        {
+            foreach (var meshVert in verts)
+            {
+                if (Mathf.Abs(meshVert.x - faceVert.x) < 0.001 && !backFaceVerts.Contains(meshVert))
+                {
+                    backFaceVerts.Add(meshVert);
+                }
+            }
+        }
+
+        List<Vector3> leftFaceVerts = new List<Vector3>();
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.leftFace))
+        {
+            foreach (var meshVert in verts)
+            {
+                if (Mathf.Abs(meshVert.x - faceVert.x) < 0.001 && !leftFaceVerts.Contains(meshVert))
+                {
+                    leftFaceVerts.Add(meshVert);
+                }
+            }
+        }
+
+        List<Vector3> rightFaceVerts = new List<Vector3>();
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.rightFace))
+        {
+            foreach (var meshVert in verts)
+            {
+                if (Mathf.Abs(meshVert.x - faceVert.x) < 0.001 && !rightFaceVerts.Contains(meshVert))
+                {
+                    rightFaceVerts.Add(meshVert);
+                }
+            }
+        }
+
+        List<Vector3> topFaceVerts = new List<Vector3>();
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.topFace))
+        {
+            foreach (var meshVert in verts)
+            {
+                if (Mathf.Abs(meshVert.y - faceVert.y) < 0.001 && !topFaceVerts.Contains(meshVert))
+                {
+                    topFaceVerts.Add(meshVert);
+                }
+            }
+        }
+
+        List<Vector3> bottomFaceVerts = new List<Vector3>();
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.bottomFace))
+        {
+            foreach (var meshVert in verts)
+            {
+                if (Mathf.Abs(meshVert.y - faceVert.y) < 0.001 && !bottomFaceVerts.Contains(meshVert))
+                {
+                    bottomFaceVerts.Add(meshVert);
+                }
+            }
+        }
+
+        var backFaceNormalised = backFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var frontFaceNormalised = frontFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var leftFaceNormalised = leftFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var rightFaceNormalised = rightFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var topFaceNormalised = topFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+        var bottomFaceNormalised = bottomFaceVerts.ConvertAll(v => new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z)));
+
+
+        return new Dictionary<FaceDirection, int>(){
+                {FaceDirection.frontFace, GetVertsHash(frontFaceNormalised)},
+                {FaceDirection.backFace, GetVertsHash(backFaceNormalised)},
+                {FaceDirection.leftFace, GetVertsHash(leftFaceNormalised)},
+                {FaceDirection.rightFace, GetVertsHash(rightFaceNormalised)},
+                {FaceDirection.topFace, GetVertsHash(topFaceNormalised)},
+                {FaceDirection.bottomFace, GetVertsHash(bottomFaceNormalised)},
+        };
+    }
+
 
     [Button("Get Boundary Points")]
     public static Dictionary<FaceDirection, List<Vector3>> GetBoundaryPoints(GameObject go)
@@ -111,7 +296,7 @@ public static class Utils
         var mesh = go.GetComponent<MeshFilter>().sharedMesh;
 
         List<Vector3> frontFaceVerts = new List<Vector3>();
-        foreach (var faceVert in GetBoundaryPointsForDirection(go, FaceDirection.frontFace))
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.frontFace))
         {
             foreach (var meshVert in mesh.vertices)
             {
@@ -123,7 +308,7 @@ public static class Utils
         }
 
         List<Vector3> backFaceVerts = new List<Vector3>();
-        foreach (var faceVert in GetBoundaryPointsForDirection(go, FaceDirection.backFace))
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.backFace))
         {
             foreach (var meshVert in mesh.vertices)
             {
@@ -135,7 +320,7 @@ public static class Utils
         }
 
         List<Vector3> leftFaceVerts = new List<Vector3>();
-        foreach (var faceVert in GetBoundaryPointsForDirection(go, FaceDirection.leftFace))
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.leftFace))
         {
             foreach (var meshVert in mesh.vertices)
             {
@@ -147,7 +332,7 @@ public static class Utils
         }
 
         List<Vector3> rightFaceVerts = new List<Vector3>();
-        foreach (var faceVert in GetBoundaryPointsForDirection(go, FaceDirection.rightFace))
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.rightFace))
         {
             foreach (var meshVert in mesh.vertices)
             {
@@ -159,7 +344,7 @@ public static class Utils
         }
 
         List<Vector3> topFaceVerts = new List<Vector3>();
-        foreach (var faceVert in GetBoundaryPointsForDirection(go, FaceDirection.topFace))
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.topFace))
         {
             foreach (var meshVert in mesh.vertices)
             {
@@ -171,7 +356,7 @@ public static class Utils
         }
 
         List<Vector3> bottomFaceVerts = new List<Vector3>();
-        foreach (var faceVert in GetBoundaryPointsForDirection(go, FaceDirection.bottomFace))
+        foreach (var faceVert in GetBoundaryPointsForDirection(FaceDirection.bottomFace))
         {
             foreach (var meshVert in mesh.vertices)
             {
@@ -231,6 +416,12 @@ public static class Utils
         // each face looks like {'left': [(x,y,z), (x,y,z), ...], 'right': [(x,y,z), (x,y,z), ...]}
     }
 
+    public static List<Vector3> GetRotatedMeshVerts(Mesh mesh, int rot)
+    {
+        List<Vector3> rotatedVerts = new List<Vector3>(StaticUtils.TransformMesh(mesh, Vector3.zero, Quaternion.Euler(0, rot, 0), new Vector3Int(1, 1, 1)));
+        return rotatedVerts;
+    }
+
     public static int GetMeshHash(GameObject go)
     {
         var mesh = go.GetComponent<MeshFilter>().sharedMesh;
@@ -267,23 +458,74 @@ public static class Utils
     }
 
 
+
+    /* final dictionary will look like:
+    modules: [
+        "moduleA": {
+            objectName: "objectX",
+            rotation: 0
+            sockets: [
+                posX: "21",
+                negX: "24s".
+                posY: "24s",
+                negY: "61",
+                posZ: "-1",
+                negZ: "v0_0"
+            ]
+        },
+        "moduleB": {
+            objectName: "objectX",
+            rotation: 90
+            sockets: [
+                posX: "24s",
+                negX: "25".
+                posY: "29",
+                negY: "61",
+                posZ: "-1",
+                negZ: "v0_1"
+            ]
+        },
+        ...
+    ]
+    */
     public static void GenerateWFCModuleAssets(GameObject go)
     {
-        var meshHashes = new Dictionary<int, GameObject>();
+        // hash the verts for each faceDirection
+        // the resulting hash is the socket name for that faceDirection
 
+        // loop through all the child gameObjects (each child should be a tile)
         for (var i = 0; i < go.transform.childCount; i++)
         {
             var child = go.transform.GetChild(i);
+
+            // repeat the process for every rotation of the tile
             foreach (var rot in new int[] { 0, 90, 180, 270 })
             {
-                var meshHash = GetMeshHashForRotation(child.gameObject, 0);
-                // add child if meshHash not in meshHashes
-                if (!meshHashes.ContainsKey(meshHash))
-                {
-                    meshHashes.Add(meshHash, child.gameObject);
-                }
+                // first get the rotated verts for the mesh
+                var mesh = child.GetComponent<MeshFilter>().sharedMesh;
+                var rotatedVerts = GetRotatedMeshVerts(mesh, rot);
+
+                // get the hashed boundary verts for this rotation (each has is the socket name)
+                var hashedBoundaryPoints = GetHashedBoundaryPointsFromVerts(rotatedVerts);
+
+                Debug.Log("Test")
+
             }
         }
+    }
+
+    /// <summary>
+    /// Returns the hash of the provided array of verts
+    /// </summary>
+    public static int GetVertsHash(List<Vector3> verts)
+    {
+        var faceDirectionHash = 0;
+        foreach (var vert in verts)
+        {
+            var vertHash = new Vector3(Mathf.Abs(vert.x), Mathf.Abs(vert.y), Mathf.Abs(vert.z)).ToString().GetHashCode();
+            faceDirectionHash += vertHash;
+        }
+        return faceDirectionHash;
     }
 
 }
