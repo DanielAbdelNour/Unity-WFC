@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df6a0e81cbc4424c85d901eea1bc9d7, type: 3}
+  m_Name: Cube.008_0
+  m_EditorClassIdentifier: 
+  module: {fileID: 0}
+  moduleName: 
+  moduleHash: -1353435176
+  moduleMesh: {fileID: 0}
+  rotation: 0
+  mirrorX: 0
+  mirrorZ: 0
+  isEmpty: 0
+  leftFaceHash: -78025039
+  rightFaceHash: -1275410137
+  forwardFaceHash: -1490048857
+  backFaceHash: 136613681
+  upFaceHash: -1353435176
+  downFaceHash: 0
+  leftValidNeighbours:
+  - {fileID: 11400000, guid: 673701c610a31444785453b26a83575d, type: 2}
+  - {fileID: 11400000}
+  rightValidNeighbours:
+  - {fileID: 11400000, guid: 3aba33c644b1a46d2a9641a4c5ffe07e, type: 2}
+  - {fileID: 11400000}
+  forwardValidNeighbours:
+  - {fileID: 11400000, guid: dfb28f24c256b45aaa3928c03e7deb43, type: 2}
+  - {fileID: 11400000}
+  backValidNeighbours:
+  - {fileID: 11400000, guid: c22da7f041844479fb2758948dccc9e1, type: 2}
+  - {fileID: 11400000}
+  upValidNeighbours: []
+  downValidNeighbours:
+  - {fileID: 0}
