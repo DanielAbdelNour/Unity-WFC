@@ -5,7 +5,7 @@ using Sirenix.OdinInspector;
 
 namespace WFC
 {
-    public class WFCModule : ScriptableObject
+    public class WFCModule : SerializedScriptableObject
     {
         public GameObject module;
         public string moduleName;
@@ -29,18 +29,18 @@ namespace WFC
         public List<WFCModule> backValidNeighbours= new();
         public List<WFCModule> upValidNeighbours= new();
         public List<WFCModule> downValidNeighbours = new();
-        
-        [Button("Generate Face Hashes")]
-        public void GenerateFaceHashes()
-        {
-            Debug.Log("oh ohi");
-        }
 
-        public GameObject GetModuleGameObject()
+        public readonly Dictionary<WFCUtils.Direction, List<WFCModule>> ValidNeighbours = new()
         {
-            return new GameObject();
-        }
-        
+            { WFCUtils.Direction.Right , new List<WFCModule>()},
+            { WFCUtils.Direction.Left , new List<WFCModule>()},
+            { WFCUtils.Direction.Up , new List<WFCModule>()},
+            { WFCUtils.Direction.Down , new List<WFCModule>()},
+            { WFCUtils.Direction.Forward , new List<WFCModule>()},
+            { WFCUtils.Direction.Back , new List<WFCModule>()}
+        };
+
+
         public bool IsValidNeighbour(WFCModule otherModule, WFCUtils.Direction direction)
         {
             if (otherModule.isEmpty)

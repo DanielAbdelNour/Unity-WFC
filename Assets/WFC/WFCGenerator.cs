@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace WFC
 {
@@ -47,18 +50,25 @@ namespace WFC
                     }
                 };
             //go.transform.localScale = new Vector3(1, 0.5f, 0.5f);
-
-            Debug.Log("Added " + cell.collapsedModule.moduleName);
         }
 
         public void Generate()
         {
-            var iter = 0;
-            while (cells.TrueForAll(x => x.IsCollapsed()) == false && iter < 1000)
+            while (cells.TrueForAll(x => x.IsCollapsed()) == false)
             {
                 Iterate();
-                iter++;
             }
+        }
+
+        IEnumerable IEGenerate()
+        {
+            while (cells.TrueForAll(x => x.IsCollapsed()) == false)
+            {
+                Iterate();
+                yield return new WaitForSeconds(0.1f);
+            }
+
+            yield return true;
         }
 
         public void Iterate()
@@ -82,17 +92,11 @@ namespace WFC
                 foreach (var dir in _dirs)
                 {
                     var validNeighbours = currentCell.candidates
-                        .ConvertAll(c => WFCUtils.GetValidNeighboursForDirection(moduleSet.modules, c, WFCUtils.VecToDir[dir]))
-                        .SelectMany(x => x.ToList())
-                        .ToList();
+                        .SelectMany(x => x.ValidNeighbours[WFCUtils.VecToDir[dir]]).ToList();
+                        // .ConvertAll(c => WFCUtils.GetValidNeighboursForDirection(moduleSet.modules, c, WFCUtils.VecToDir[dir]))
+                        // .SelectMany(x => x.ToList())
+                        // .ToList();
                     
-                    // foreach (var c in currentCell.candidates)
-                    // {
-                    //     var d = WFCUtils.VecToDir[dir];
-                    //     var n = WFCUtils.GetValidNeighboursForDirection(currentCell.candidates, c, d);
-                    //     
-                    // }
-
                     // get the cell at the direction
                     var cellAtDir = cells.Find(c => c.transform.position == currentCell.transform.position + dir*2);
 

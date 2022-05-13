@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5df6a0e81cbc4424c85d901eea1bc9d7, type: 3}
-  m_Name: Empty
+  m_Name: Triangle_90
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2
@@ -181,40 +181,25 @@ MonoBehaviour:
       Data: 
   module: {fileID: 0}
   moduleName: 
-  moduleHash: 0
+  moduleHash: -461514160
   moduleMesh: {fileID: 0}
-  rotation: 0
+  rotation: 90
   mirrorX: 0
   mirrorZ: 0
-  isEmpty: 1
-  leftFaceHash: 0
-  rightFaceHash: 0
-  forwardFaceHash: 0
-  backFaceHash: 0
-  upFaceHash: 0
-  downFaceHash: 0
+  isEmpty: 0
+  leftFaceHash: -427095168
+  rightFaceHash: -34418992
+  forwardFaceHash: -1125681026
+  backFaceHash: 698585858
+  upFaceHash: -156050078
+  downFaceHash: -271045090
   leftValidNeighbours:
-  - {fileID: 11400000, guid: 62680aaf5c4fb46ff9d8251b0dbb06cb, type: 2}
-  - {fileID: 11400000, guid: 0c406a6c176db40b7a1f2d706ed22399, type: 2}
-  - {fileID: 11400000, guid: 4306ba80875f54a8da1c767c7306aef3, type: 2}
-  - {fileID: 11400000}
+  - {fileID: 0}
   rightValidNeighbours:
-  - {fileID: 11400000, guid: dff9d7549f73048929e5ed2cdec83e3e, type: 2}
-  - {fileID: 11400000, guid: ac145a1af946141b58be2e8df2e8bd22, type: 2}
-  - {fileID: 11400000, guid: b38b439363c5548539894898b492f13a, type: 2}
-  - {fileID: 11400000}
+  - {fileID: 0}
   forwardValidNeighbours:
-  - {fileID: 11400000, guid: 14e2f35b7adc944d0a6ba3d1cadd0e7b, type: 2}
-  - {fileID: 11400000, guid: 4306ba80875f54a8da1c767c7306aef3, type: 2}
-  - {fileID: 11400000, guid: b38b439363c5548539894898b492f13a, type: 2}
   - {fileID: 11400000}
   backValidNeighbours:
-  - {fileID: 11400000, guid: 4eb45800813dc48399c529b30b88d0ba, type: 2}
-  - {fileID: 11400000, guid: ac145a1af946141b58be2e8df2e8bd22, type: 2}
-  - {fileID: 11400000, guid: 0c406a6c176db40b7a1f2d706ed22399, type: 2}
   - {fileID: 11400000}
-  upValidNeighbours:
-  - {fileID: 11400000, guid: cff8cc8d83828422ab23aea38e36c4e0, type: 2}
-  - {fileID: 11400000}
-  downValidNeighbours:
-  - {fileID: 11400000}
+  upValidNeighbours: []
+  downValidNeighbours: []

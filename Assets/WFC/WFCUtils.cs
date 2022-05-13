@@ -188,6 +188,25 @@ namespace WFC
             
             AssetDatabase.CreateAsset(moduleSet, "Assets/WFC/Modules/ModuleSet.asset");
 
+            foreach (var module in moduleSet.modules)
+            {
+                foreach (var otherModule in moduleSet.modules)
+                {
+                    foreach (var dir in Enum.GetValues(typeof(Direction)))
+                    {
+                        if (module.IsValidNeighbour(otherModule, (Direction)dir))
+                        {
+                            if (!module.ValidNeighbours.ContainsKey((Direction)dir))
+                            {
+                                module.ValidNeighbours.Add((Direction)dir, new List<WFCModule>());
+                            }
+                            
+                            module.ValidNeighbours[(Direction)dir].Add(otherModule);
+                        }
+                    }
+                }
+            }
+
         }
 
         public static List<WFCModule> GetValidNeighboursForDirection(List<WFCModule> candidates, WFCModule module, Direction dir)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
@@ -12,7 +13,7 @@ namespace WFC.Editor
 {
     public class WFCTools : EditorWindow
     {
-        private WFCGenerator _generatorInstance;
+        // private WFCGenerator _generatorInstance;
 
         
         [MenuItem("Window/WFC Tools")]
@@ -53,40 +54,32 @@ namespace WFC.Editor
 
             moduleGameObjects.RegisterValueChangedCallback(evt => { generateModules.SetEnabled(evt.newValue != null); });
             generateModules.SetEnabled(false);
+            
+            restart.clicked += () =>
+            {
+                DestroyImmediate(GameObject.Find("WFCCells"));
+                DestroyImmediate(GameObject.Find("GeneratedLevel"));
+            };
             generateModules.clicked += () =>
             {
                 WFCUtils.GenerateWFCModuleAssets((GameObject)moduleGameObjects.value);
                 moduleSet.value = AssetDatabase.LoadAssetAtPath<WFCModuleSet>("Assets/WFC/Modules/ModuleSet.asset");
                 WFCUtils.GenerateCells((WFCModuleSet)moduleSet.value, gridSize.value);
                 cellGameObjects.value = GameObject.Find("WFCCells");
-                _generatorInstance = CreateInstance<WFCGenerator>();
-                _generatorInstance.moduleSet = (WFCModuleSet)moduleSet.value;
+                var generatorInstance = CreateInstance<WFCGenerator>();
+                generatorInstance.moduleSet = (WFCModuleSet)moduleSet.value;
                 var cells = cellGameObjects.value.GetComponentsInChildren<WFCCell>().ToList();
-                _generatorInstance.cells = cells;
-                AssetDatabase.CreateAsset(_generatorInstance, "Assets/WFC/Modules/WFCGenerator.Asset");
-                wfcGenerator.value = _generatorInstance;
+                generatorInstance.cells = cells;
+                AssetDatabase.CreateAsset(generatorInstance, "Assets/WFC/Modules/WFCGenerator.Asset");
+                wfcGenerator.value = generatorInstance;
             };
             iterateWFC.clicked += () =>
             {
                 ((WFCGenerator)wfcGenerator.value).Iterate();
             };
-            restart.clicked += () =>
-            {
-                DestroyImmediate(GameObject.Find("WFCCells"));
-                DestroyImmediate(GameObject.Find("GeneratedLevel"));
-            };
             runWFC.clicked += () =>
             {
-                var iter = 0;
-                if (_generatorInstance)
-                {
-                    while (iter < 100)
-                    {
-                        _generatorInstance.Iterate();
-                        progressBar.value += 1;
-                        iter++;
-                    }
-                }
+                ((WFCGenerator)wfcGenerator.value).Generate();
             };
             
             root.Add(restart);
@@ -129,8 +122,6 @@ namespace WFC.Editor
             root.Add(compareModules);
             root.Add(validNeighbours);
             // END DEBUGGING
-        
-
         }
     }
 }
